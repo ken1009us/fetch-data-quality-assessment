@@ -6,6 +6,16 @@ from pathlib import Path
 
 
 def get_dataframe(filename):
+    """
+    Retrieve a DataFrame from a JSON file.
+
+    Args:
+        filename (str): Name of the JSON file.
+
+    Returns:
+        pd.DataFrame: DataFrame created from the JSON data.
+
+    """
     data_path = Path('.') / 'data'
     json_processor = JSONProcessor(data_path)
 
@@ -24,7 +34,13 @@ def get_dataframe(filename):
 
 
 def data_cleaning(df):
+    """
+    Perform data cleaning operations on the DataFrame.
 
+    Args:
+        df (pd.DataFrame): DataFrame to be cleaned.
+
+    """
     # Inconsistent column names
     df.rename(columns={'_id.$oid': 'id',
                        'createDate.$date': 'createDate',
@@ -73,15 +89,19 @@ def data_cleaning(df):
         most_frequent_points_earned = points_earned_col.mode().iloc[0]
         df['pointsEarned'].fillna(most_frequent_points_earned, inplace=True)
 
-    print(df)
+    return df
 
 
 def main():
+    """
+    Main function to execute the data cleaning process.
+
+    """
     # filename = input("Enter the JSON filename to process: ")
     filename = 'receipts.json'
     brands_df = get_dataframe(filename)
-    data_cleaning(brands_df)
-
+    cleaned_data = data_cleaning(brands_df)
+    print(cleaned_data)
 
 
 if __name__ == "__main__":
