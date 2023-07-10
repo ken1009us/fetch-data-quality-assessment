@@ -77,5 +77,3 @@ Data cleaning operations: You can customize the data cleaning operations in the 
 ## Database Integration
 
 The script assumes a MySQL database is set up with the required tables defined in the db_tables.sql script. You need to modify the script and provide your database connection details to integrate with the database. Once integrated, you can execute the SQL queries in the queries.sql script to analyze the dataset using the database.
-
-
