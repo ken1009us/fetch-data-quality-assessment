@@ -54,24 +54,30 @@ ORDER BY total_items_purchased DESC;
 
 -- 5. Which brand has the most spend among users who were created within the past 6 months?
 
-SELECT b.name AS brand_name, SUM(r.total_spent) AS total_spend
-FROM brand b
-JOIN receipt_item ri ON b.barcode = ri.barcode
-JOIN receipt r ON ri.receipt_id = r.id
-JOIN users u ON r.user_id = u.id
-WHERE u.created_date >= DATE_SUB(CURRENT_DATE, INTERVAL 6 MONTH)
-GROUP BY b.name
-ORDER BY total_spend DESC
-LIMIT 1;
+SELECT brand_name, total_spend
+FROM (
+  SELECT b.name AS brand_name, SUM(r.total_spent) AS total_spend,
+         ROW_NUMBER() OVER (ORDER BY SUM(r.total_spent) DESC) AS rn
+  FROM brand b
+  JOIN receipt_item ri ON b.barcode = ri.barcode
+  JOIN receipt r ON ri.receipt_id = r.id
+  JOIN users u ON r.user_id = u.id
+  WHERE u.created_date >= DATE_SUB(CURRENT_DATE, INTERVAL 6 MONTH)
+  GROUP BY b.name
+) AS subquery
+WHERE rn = 1;
 
 -- 6. Which brand has the most transactions among users who were created within the past 6 months?
 
-SELECT b.name AS brand_name, COUNT(*) AS transaction_count
-FROM brand b
-JOIN receipt_item ri ON b.barcode = ri.barcode
-JOIN receipt r ON ri.receipt_id = r.id
-JOIN users u ON r.user_id = u.id
-WHERE u.created_date >= DATE_SUB(CURRENT_DATE, INTERVAL 6 MONTH)
-GROUP BY b.name
-ORDER BY transaction_count DESC
-LIMIT 1;
+SELECT brand_name, transaction_count
+FROM (
+  SELECT b.name AS brand_name, COUNT(*) AS transaction_count,
+         ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC) AS rn
+  FROM brand b
+  JOIN receipt_item ri ON b.barcode = ri.barcode
+  JOIN receipt r ON ri.receipt_id = r.id
+  JOIN users u ON r.user_id = u.id
+  WHERE u.created_date >= DATE_SUB(CURRENT_DATE, INTERVAL 6 MONTH)
+  GROUP BY b.name
+) AS subquery
+WHERE rn = 1;
